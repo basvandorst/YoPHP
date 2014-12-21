@@ -47,7 +47,6 @@ class Yo {
        } else {
            throw new Exception('Please set a valid token..');
        }
-       
    }
    
    /**
@@ -64,9 +63,28 @@ class Yo {
        $result = $this->call(self::HTTP_POST, $url, $params);
        return $result;
    }
+
+   /**
+    * YO all your subscribers with link
+    * 
+    * @param string link
+    * @return stdClass
+    */
+   public function allWithLink($link) {
+       if(!$this->verifyUrl($link)) throw new Exception('Bad url');
+
+       $url = self::$endpoint.'/yoall/';
+       
+       $params = array(
+           'api_token' => $this->token,
+           'link' => $link
+       );
+       $result = $this->call(self::HTTP_POST, $url, $params);
+       return $result;
+   }
        
    /**
-    * YO a specific username
+    * YO a specific user
     * 
     * @param string $username
     * @return stdClass
@@ -81,7 +99,51 @@ class Yo {
        $result = $this->call(self::HTTP_POST, $url, $params);
        return $result;
    }
-   
+
+   /**
+    * YO a specific user with link
+    * 
+    * @param string $username
+    * @param string $url
+    * @return stdClass
+    * @throws Exception
+    */
+   public function userWithLink($username, $link) {
+       if(!$this->verifyUrl($link)) throw new Exception('Bad url');
+
+       $url = self::$endpoint.'/yo/';
+       
+       $params = array(
+           'api_token' => $this->token,
+           'username' => $username,
+           'link' => $link
+       );
+       $result = $this->call(self::HTTP_POST, $url, $params);
+       return $result;
+   }
+
+   /**
+    * YO a specific user with location
+    * 
+    * @param string $username
+    * @param string $location
+    * @return stdClass
+    * @throws Exception
+    */
+   public function userWithLocation($username, $location) {
+       if(!$this->verifyLocation($location)) throw new Exception('Bad location format (lat,long)');
+
+       $url = self::$endpoint.'/yo/';
+       
+       $params = array(
+           'api_token' => $this->token,
+           'username' => $username,
+           'location' => $location
+       );
+       $result = $this->call(self::HTTP_POST, $url, $params);
+       return $result;
+   }
+
    /**
     * Returns the number of subscribers.
     * 
@@ -96,6 +158,36 @@ class Yo {
        );
        $result = $this->call(self::HTTP_GET, $url, $params);
        return $result;
+   }
+
+   /**
+    * Verifies the validity of an url
+    * 
+    * @param string $url
+    * @return boolean
+    */
+   private function verifyUrl($url) {
+       if(filter_var($url, FILTER_VALIDATE_URL) === false) return false;
+
+       return true;
+   }
+
+   /**
+    * Verifies the format of a location (lat,long)
+    * 
+    * @param string $location
+    * @return boolean
+    */
+   private function verifyLocation($location) {
+       // Tests if the location contains a comma and not more than 2 dots
+       if(substr_count($location, ',') < 1 || substr_count($location, ',') > 1 || substr_count($location, '.') > 2) return false;
+
+       // Tests if the location only contains digits (except dots and comma)
+       $location = str_replace(',', '', $location);
+       $location = str_replace('.', '', $location);
+       if(!ctype_digit($location)) return false;
+
+       return true;
    }
    
    /**
