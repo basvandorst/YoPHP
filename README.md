@@ -41,8 +41,8 @@ $yo->user('BASVD', null, '52.2129918,5.2793703'); // Yo with location
 Create new Yo accounts
 ```php
 $yo = new Yo(YO_TOKEN);
-$result = $yo->create('FOOBAR',12345);
-$result = $yo->create('FOOBAR',12345,'http://callback.url','foo@bar.org','description',true);
+$result = $yo->create('FOOBAR', 12345);
+$result = $yo->create('FOOBAR', 12345, 'http://callback.url', 'foo@bar.org', 'description', true);
 ```
 
 Checks if a username exists:

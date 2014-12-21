@@ -52,7 +52,7 @@ class Yo {
    
    /**
     * YO all your subscribers
-    
+    * 
     * @param string $link optional
     * @return stdClass
     */
