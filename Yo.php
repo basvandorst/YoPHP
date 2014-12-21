@@ -47,7 +47,6 @@ class Yo {
        } else {
            throw new Exception('Please set a valid token..');
        }
-       
    }
    
    /**
@@ -56,32 +55,91 @@ class Yo {
     * @return stdClass
     */
    public function all() {
+       return $this->allWithLink('');
+   }
+
+   /**
+    * YO all your subscribers with link
+    * 
+    * @param string $link
+    * @return stdClass
+    */
+   public function allWithLink($link) {
+       if(!empty($link) && !$this->verifyUrl($link)) throw new Exception('Bad url');
+
        $url = self::$endpoint.'/yoall/';
        
        $params = array(
-           'api_token' => $this->token,
+           'api_token' => $this->token
        );
+
+       if(!empty($link)) $params['link'] = $link;
+
        $result = $this->call(self::HTTP_POST, $url, $params);
        return $result;
    }
        
    /**
-    * YO a specific username
+    * YO a specific user
     * 
     * @param string $username
     * @return stdClass
     */
    public function user($username) {
-       $url = self::$endpoint.'/yo/';
+       return $this->userRequest($username, '', '');
+   }
+
+   /**
+    * YO a specific user with link
+    * 
+    * @param string $username
+    * @param string $link
+    * @return stdClass
+    * @throws Exception
+    */
+   public function userWithLink($username, $link) {
+       return $this->userRequest($username, $link, '');
+   }
+
+   /**
+    * YO a specific user with location
+    * 
+    * @param string $username
+    * @param string $location
+    * @return stdClass
+    * @throws Exception
+    */
+   public function userWithLocation($username, $location) {
+       return $this->userRequest($username, '', $location);
+   }
+
+   /**
+    * Prepares request to Yo a specific user (with link/location optional)
+    * 
+    * @param string $username
+    * @param string $link
+    * @param string $location
+    * @return stdClass
+    * @throws Exception
+    */
+   private function userRequest($username, $link, $location) {
+       if(!empty($link) && !$this->verifyUrl($link)) throw new Exception('Bad url');
+       if(!empty($location) && !$this->verifyLocation($location)) throw new Exception('Bad location format (lat,long)');
+       
+       $url = self::$endpoint.'/yoall/';
        
        $params = array(
            'api_token' => $this->token,
-           'username' => $username,
+           'username' => $username
        );
+       if(!empty($link)) $params['link'] = $link;
+       if(!empty($location)) $params['location'] = $location;
+
        $result = $this->call(self::HTTP_POST, $url, $params);
        return $result;
+
    }
-   
+
    /**
     * Returns the number of subscribers.
     * 
@@ -96,6 +154,36 @@ class Yo {
        );
        $result = $this->call(self::HTTP_GET, $url, $params);
        return $result;
+   }
+
+   /**
+    * Verifies the validity of an url
+    * 
+    * @param string $url
+    * @return boolean
+    */
+   private function verifyUrl($url) {
+       if(filter_var($url, FILTER_VALIDATE_URL) === false) return false;
+
+       return true;
+   }
+
+   /**
+    * Verifies the format of a location (lat,long)
+    * 
+    * @param string $location
+    * @return boolean
+    */
+   private function verifyLocation($location) {
+       // Tests if the location contains a comma and not more than 2 dots
+       if(substr_count($location, ',') < 1 || substr_count($location, ',') > 1 || substr_count($location, '.') > 2) return false;
+
+       // Tests if the location only contains digits (except dots and comma)
+       $location = str_replace(',', '', $location);
+       $location = str_replace('.', '', $location);
+       if(!ctype_digit($location)) return false;
+
+       return true;
    }
    
    /**
