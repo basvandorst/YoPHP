@@ -125,7 +125,9 @@ class Yo {
    private function userRequest($username, $link, $location) {
        if(!empty($link) && !$this->verifyUrl($link)) throw new Exception('Bad url');
        if(!empty($location) && !$this->verifyLocation($location)) throw new Exception('Bad location format (lat,long)');
-
+       
+       $url = self::$endpoint.'/yoall/';
+       
        $params = array(
            'api_token' => $this->token,
            'username' => $username
