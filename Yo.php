@@ -86,14 +86,7 @@ class Yo {
     * @return stdClass
     */
    public function user($username) {
-       $url = self::$endpoint.'/yo/';
-       
-       $params = array(
-           'api_token' => $this->token,
-           'username' => $username,
-       );
-       $result = $this->call(self::HTTP_POST, $url, $params);
-       return $result;
+       return $this->userRequest($username, '', '');
    }
 
    /**
