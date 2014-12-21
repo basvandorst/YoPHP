@@ -1,5 +1,6 @@
 YoPHP
 ===========
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/basvandorst/YoPHP/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/basvandorst/YoPHP/?branch=master)
 
 A simple PHP wrapper for YO (www.justyo.co)
 
