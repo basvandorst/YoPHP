@@ -52,33 +52,104 @@ class Yo {
    
    /**
     * YO all your subscribers
-    * 
+    
+    * @param string $link optional
     * @return stdClass
     */
-   public function all() {
+   public function all($link = null) {
        $url = self::$endpoint.'/yoall/';
        
        $params = array(
-           'api_token' => $this->token,
+           'api_token' => $this->token
        );
+       
+       if($link !== null) {
+           $params['link'] = $link;
+       }
+       
+       $result = $this->call(self::HTTP_POST, $url, $params);
+       return $result;
+   }
+   
+   /**
+    * Create new Yo accounts
+    * 
+    * @param string $username
+    * @param string $passcode
+    * @param string $callback_url optional
+    * @param string $email optional
+    * @param string $description optional
+    * @param boolean $needs_location optional
+    * @return stdClass
+    */
+   public function create($username, $passcode, $callback_url = null, $email = null, $description = null, $needs_location = false) {
+       $url = self::$endpoint.'/accounts/';
+       
+       $params = array(
+           'api_token' => $this->token,
+           'new_account_username' => strtoupper($username),
+           'new_account_passcode' => $passcode,
+       );
+       
+       if($callback_url !== null) {
+           $params['callback_url'] = $callback_url;
+       }
+       if($email !== null) {
+           $params['email'] = $email;
+       }
+       if($description !== null) {
+           $params['description'] = $description;
+       }
+       if($needs_location !== false) {
+           $params['needs_location'] = true; 
+       }
+       
        $result = $this->call(self::HTTP_POST, $url, $params);
        return $result;
    }
        
    /**
-    * YO a specific username
+    * YO a specific user
     * 
-    * @param string $username
+    * @param string $user
+    * @param string $link optional
+    * @param string $location optional
     * @return stdClass
     */
-   public function user($username) {
+   public function user($user, $link = null, $location = null) {
        $url = self::$endpoint.'/yo/';
        
        $params = array(
            'api_token' => $this->token,
-           'username' => $username,
+           'username' => $user
        );
+       if($link !== null) {
+           $params['link'] = $link;
+       }
+       
+       if($link === null && $location !== null) {
+           $params['location'] = $location;
+       }
+           
+       
        $result = $this->call(self::HTTP_POST, $url, $params);
+       return $result;
+   }
+   
+   /**
+    * Checks if a Yo user exists
+    * 
+    * @param string $user
+    * @return stdClass
+    */
+   public function check($user) {
+       $url = self::$endpoint.'/check_username/';
+       
+       $params = array(
+           'api_token' => $this->token,
+           'username' => $user
+       );
+       $result = $this->call(self::HTTP_GET, $url, $params);
        return $result;
    }
    
@@ -92,7 +163,7 @@ class Yo {
        $url = self::$endpoint.'/subscribers_count/';
        
        $params = array(
-           'api_token' => $this->token,
+           'api_token' => $this->token
        );
        $result = $this->call(self::HTTP_GET, $url, $params);
        return $result;
