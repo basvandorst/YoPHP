@@ -55,30 +55,26 @@ class Yo {
     * @return stdClass
     */
    public function all() {
-       $url = self::$endpoint.'/yoall/';
-       
-       $params = array(
-           'api_token' => $this->token,
-       );
-       $result = $this->call(self::HTTP_POST, $url, $params);
-       return $result;
+       return $this->allWithLink('');
    }
 
    /**
     * YO all your subscribers with link
     * 
-    * @param string link
+    * @param string $link
     * @return stdClass
     */
    public function allWithLink($link) {
-       if(!$this->verifyUrl($link)) throw new Exception('Bad url');
+       if(!empty($link) && !$this->verifyUrl($link)) throw new Exception('Bad url');
 
        $url = self::$endpoint.'/yoall/';
        
        $params = array(
-           'api_token' => $this->token,
-           'link' => $link
+           'api_token' => $this->token
        );
+
+       if(!empty($link)) $params['link'] = $link;
+
        $result = $this->call(self::HTTP_POST, $url, $params);
        return $result;
    }
@@ -104,22 +100,12 @@ class Yo {
     * YO a specific user with link
     * 
     * @param string $username
-    * @param string $url
+    * @param string $link
     * @return stdClass
     * @throws Exception
     */
    public function userWithLink($username, $link) {
-       if(!$this->verifyUrl($link)) throw new Exception('Bad url');
-
-       $url = self::$endpoint.'/yo/';
-       
-       $params = array(
-           'api_token' => $this->token,
-           'username' => $username,
-           'link' => $link
-       );
-       $result = $this->call(self::HTTP_POST, $url, $params);
-       return $result;
+       return $this->userRequest($username, $link, '');
    }
 
    /**
@@ -131,17 +117,32 @@ class Yo {
     * @throws Exception
     */
    public function userWithLocation($username, $location) {
-       if(!$this->verifyLocation($location)) throw new Exception('Bad location format (lat,long)');
+       return $this->userRequest($username, '', $location);
+   }
 
-       $url = self::$endpoint.'/yo/';
-       
+   /**
+    * Prepares request to Yo a specific user (with link/location optional)
+    * 
+    * @param string $username
+    * @param string $link
+    * @param string $location
+    * @return stdClass
+    * @throws Exception
+    */
+   private function userRequest($username, $link, $location) {
+       if(!empty($link) && !$this->verifyUrl($link)) throw new Exception('Bad url');
+       if(!empty($location) && !$this->verifyLocation($location)) throw new Exception('Bad location format (lat,long)');
+
        $params = array(
            'api_token' => $this->token,
-           'username' => $username,
-           'location' => $location
+           'username' => $username
        );
+       if(!empty($link)) $params['link'] = $link;
+       if(!empty($location)) $params['location'] = $location;
+
        $result = $this->call(self::HTTP_POST, $url, $params);
        return $result;
+
    }
 
    /**
